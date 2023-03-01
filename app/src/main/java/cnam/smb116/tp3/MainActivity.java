@@ -43,7 +43,8 @@ public class MainActivity extends AppCompatActivity {
         //listeUE.add("INA136"); listeUE.add("SAE126"); listeUE.add("MAA136");
         //listeUE.add("ELA136"); listeUE.add("ELE137");
 
-        loadListeUE();
+        // On charge la liste depuis les SharedPreferences
+        loadUEList();
 
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listeUE);
         listView.setAdapter(adapter);
@@ -64,17 +65,17 @@ public class MainActivity extends AppCompatActivity {
         final EditText textInput = findViewById(R.id.textInput);
         listeUE.add(textInput.getText().toString());
         textInput.getText().clear();
-        // On actualise l'adapter pour mettre à jour l'IHM
+        // On actualise l'adapter pour mettre à jour l'IHM et on enregistre la liste
         adapter.notifyDataSetChanged();
         saveUEList();
     }
 
-    // Fonction supprimant l'UE choisie de la liste
+    // Supprimant l'UE choisie de la liste
     public void deleteUE(Intent intentResult) {
         // On récupère l'UE à supprimer dans l'intent et on la supprime de la liste
         String deletedUE = intentResult.getStringExtra("deletedUE");
         listeUE.remove(deletedUE);
-        // On actualise l'adapter pour mettre à jour l'IHM
+        // On actualise l'adapter pour mettre à jour l'IHM et on enregistre la liste
         adapter.notifyDataSetChanged();
         saveUEList();
     }
@@ -83,12 +84,13 @@ public class MainActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK) {
-                    // Au retour de l'activité UEActivity, si on a un RESULT_OK (l'utilisateur à choisi de supprimer l'UE de la liste) on récupère l'intent et on exécute la fonction deleteUE
+                    // Au retour de l'activité UEActivity, si on a un RESULT_OK (l'utilisateur a choisi de supprimer l'UE de la liste) on récupère l'intent et on exécute la fonction deleteUE
                     Intent data = result.getData();
                     deleteUE(data);
                 }
             });
 
+    // Concatène tous les élèments de la liste en une String et l'enregistre dans les SharedPreferences
     private void saveUEList() {
         StringBuilder csvList = new StringBuilder();
         for(String s : listeUE){
@@ -101,7 +103,9 @@ public class MainActivity extends AppCompatActivity {
         sEdit.apply();
     }
 
-    private void loadListeUE() {
+    // Récupère la String contenant les élèments de la liste dans les SharedPreferences et récréer la liste.
+    // Si elle n'existe pas, recréer la liste par défaut
+    private void loadUEList() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String listUEString = prefs.getString("listUE", null);
         if (listUEString == null || listUEString.length() == 0) {
