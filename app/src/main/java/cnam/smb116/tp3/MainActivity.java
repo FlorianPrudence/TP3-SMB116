@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this,UEActivity.class);
             intent.putExtra("selectedUE", selectedUE);
             // On démarre l'activité en via l'ActivityResultLauncher pour savoir si l'utilisateur à bien supprimé l'UE
+            //startActivity(intent);
             UEActivityResult.launch(intent);
         });
     }
@@ -84,7 +85,8 @@ public class MainActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK) {
-                    // Au retour de l'activité UEActivity, si on a un RESULT_OK (l'utilisateur a choisi de supprimer l'UE de la liste) on récupère l'intent et on exécute la fonction deleteUE
+                    // Au retour de l'activité UEActivity, si on a un RESULT_OK (l'utilisateur a choisi de supprimer l'UE de la liste)
+                    // on récupère l'intent et on exécute la fonction deleteUE
                     Intent data = result.getData();
                     deleteUE(data);
                 }
